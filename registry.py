@@ -99,6 +99,7 @@ def get_dataset(name: str, data_root: str='data', return_transform=False, split=
     data_root = os.path.expanduser( data_root )
 
     if name == 'mnist-3ch':
+        print("-----[][][][]-----")
         num_classes = 10
         train_transform = T.Compose([
             T.Grayscale(num_output_channels=3),
