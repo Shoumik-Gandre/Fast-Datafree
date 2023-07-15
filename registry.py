@@ -1,4 +1,4 @@
-from datafree.models import classifiers, deeplab
+# from datafree.models import classifiers, deeplab
 from torchvision import datasets, transforms as T
 from datafree.utils import sync_transforms as sT
 
@@ -14,6 +14,9 @@ import datafree
 import torch.nn as nn 
 from PIL import Image
 from datafree.datasets.smallimagenet import SmallImagenet
+from models.lenet import LeNet5
+from functools import partial
+
 
 NORMALIZE_DICT = {
     'mnist':    dict( mean=(0.1307,),                std=(0.3081,) ),
@@ -39,41 +42,42 @@ NORMALIZE_DICT = {
 
 
 MODEL_DICT = {
-    # https://github.com/polo5/ZeroShotKnowledgeTransfer
-    'wrn16_1': classifiers.wresnet.wrn_16_1,
-    'wrn16_2': classifiers.wresnet.wrn_16_2,
-    'wrn40_1': classifiers.wresnet.wrn_40_1,
-    'wrn40_2': classifiers.wresnet.wrn_40_2,
+    'lenet5-3ch': partial(LeNet5, num_channels=3),
+    # # https://github.com/polo5/ZeroShotKnowledgeTransfer
+    # 'wrn16_1': classifiers.wresnet.wrn_16_1,
+    # 'wrn16_2': classifiers.wresnet.wrn_16_2,
+    # 'wrn40_1': classifiers.wresnet.wrn_40_1,
+    # 'wrn40_2': classifiers.wresnet.wrn_40_2,
 
-    # https://github.com/HobbitLong/RepDistiller
-    'resnet8': classifiers.resnet_tiny.resnet8,
-    'resnet20': classifiers.resnet_tiny.resnet20,
-    'resnet32': classifiers.resnet_tiny.resnet32,
-    'resnet56': classifiers.resnet_tiny.resnet56,
-    'resnet110': classifiers.resnet_tiny.resnet110,
-    'resnet8x4': classifiers.resnet_tiny.resnet8x4,
-    'resnet32x4': classifiers.resnet_tiny.resnet32x4,
-    'vgg8': classifiers.vgg.vgg8_bn,
-    'vgg11': classifiers.vgg.vgg11_bn,
-    'vgg13': classifiers.vgg.vgg13_bn,
-    'shufflenetv2': classifiers.shufflenetv2.shuffle_v2,
-    'mobilenetv2': classifiers.mobilenetv2.mobilenet_v2,
+    # # https://github.com/HobbitLong/RepDistiller
+    # 'resnet8': classifiers.resnet_tiny.resnet8,
+    # 'resnet20': classifiers.resnet_tiny.resnet20,
+    # 'resnet32': classifiers.resnet_tiny.resnet32,
+    # 'resnet56': classifiers.resnet_tiny.resnet56,
+    # 'resnet110': classifiers.resnet_tiny.resnet110,
+    # 'resnet8x4': classifiers.resnet_tiny.resnet8x4,
+    # 'resnet32x4': classifiers.resnet_tiny.resnet32x4,
+    # 'vgg8': classifiers.vgg.vgg8_bn,
+    # 'vgg11': classifiers.vgg.vgg11_bn,
+    # 'vgg13': classifiers.vgg.vgg13_bn,
+    # 'shufflenetv2': classifiers.shufflenetv2.shuffle_v2,
+    # 'mobilenetv2': classifiers.mobilenetv2.mobilenet_v2,
     
-    # https://github.com/huawei-noah/Data-Efficient-Model-Compression/tree/master/DAFL
-    'resnet50':  classifiers.resnet.resnet50,
-    'resnet18':  classifiers.resnet.resnet18,
-    'resnet34':  classifiers.resnet.resnet34,
+    # # https://github.com/huawei-noah/Data-Efficient-Model-Compression/tree/master/DAFL
+    # 'resnet50':  classifiers.resnet.resnet50,
+    # 'resnet18':  classifiers.resnet.resnet18,
+    # 'resnet34':  classifiers.resnet.resnet34,
 }
 
 IMAGENET_MODEL_DICT = {
-    'resnet50_imagenet': classifiers.resnet_in.resnet50,
-    'resnet18_imagenet': classifiers.resnet_in.resnet18,
-    'mobilenetv2_imagenet': torchvision.models.mobilenet_v2,
+    # 'resnet50_imagenet': classifiers.resnet_in.resnet50,
+    # 'resnet18_imagenet': classifiers.resnet_in.resnet18,
+    # 'mobilenetv2_imagenet': torchvision.models.mobilenet_v2,
 }
 
 SEGMENTATION_MODEL_DICT = {
-    'deeplabv3_resnet50':  deeplab.deeplabv3_resnet50,
-    'deeplabv3_mobilenet': deeplab.deeplabv3_mobilenet,
+    # 'deeplabv3_resnet50':  deeplab.deeplabv3_resnet50,
+    # 'deeplabv3_mobilenet': deeplab.deeplabv3_mobilenet,
 }
 
 
@@ -93,7 +97,24 @@ def get_dataset(name: str, data_root: str='data', return_transform=False, split=
     name = name.lower()
     data_root = os.path.expanduser( data_root )
 
-    if name=='mnist':
+    if name == 'mnist-3ch':
+        num_classes = 10
+        train_transform = T.Compose([
+            T.Grayscale(num_output_channels=3),
+            T.Resize((32, 32)),
+            T.ToTensor(),
+            T.Normalize( **NORMALIZE_DICT[name] ),
+        ])
+        val_transform = T.Compose([
+            T.Resize((32, 32)),
+            T.ToTensor(),
+            T.Normalize( **NORMALIZE_DICT[name] ),
+        ])      
+        data_root = os.path.join( data_root, 'torchdata' ) 
+        train_dst = datasets.MNIST(data_root, train=True, download=True, transform=train_transform)
+        val_dst = datasets.MNIST(data_root, train=False, download=True, transform=val_transform)
+
+    elif name=='mnist':
         num_classes = 10
         train_transform = T.Compose([
             T.Resize((32, 32)),
