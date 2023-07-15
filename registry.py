@@ -107,6 +107,7 @@ def get_dataset(name: str, data_root: str='data', return_transform=False, split=
             T.Normalize( **NORMALIZE_DICT[name] ),
         ])
         val_transform = T.Compose([
+            T.Grayscale(num_output_channels=3),
             T.Resize((32, 32)),
             T.ToTensor(),
             T.Normalize( **NORMALIZE_DICT[name] ),
