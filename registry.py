@@ -43,7 +43,7 @@ NORMALIZE_DICT = {
 
 
 MODEL_DICT = {
-    'lenet5-3ch': partial(LeNet5, num_channels=3),
+    'lenet5-3ch': lambda num_classes: LeNet5(in_channels=3, num_labels=num_classes),
     # https://github.com/polo5/ZeroShotKnowledgeTransfer
     'wrn16_1': classifiers.wresnet.wrn_16_1,
     'wrn16_2': classifiers.wresnet.wrn_16_2,
