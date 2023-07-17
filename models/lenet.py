@@ -30,7 +30,7 @@ class LeNet5(nn.Module):
         feature = self.feature_extractor(img)
         output = self.classifier(feature)
 
-        if out_feature == False:
+        if return_features == False:
             return output
         else:
             return output, feature
