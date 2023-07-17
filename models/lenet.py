@@ -18,15 +18,15 @@ class LeNet5(nn.Module):
             nn.Conv2d(16, 120, kernel_size=5),
             nn.ReLU(),
             nn.Flatten(),
+            nn.Linear(120, 84),
+            nn.ReLU(),
         )
 
         self.classifier = nn.Sequential(
-            nn.Linear(120, 84),
-            nn.ReLU(),
             nn.Linear(84, num_labels),
         )
 
-    def forward(self, img, out_feature=False):
+    def forward(self, img, return_features=False):
         feature = self.feature_extractor(img)
         output = self.classifier(feature)
 
