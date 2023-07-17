@@ -206,7 +206,7 @@ def main_worker(gpu, ngpus_per_node, args):
         val_dataset,
         batch_size=args.batch_size, shuffle=False,
         num_workers=args.workers, pin_memory=True)
-    evaluator = datafree.evaluators.classification_evaluator(val_loader)
+    evaluator = datafree.evaluators.classification_evaluator2(val_loader)
 
     ############################################
     # Setup models
@@ -383,12 +383,15 @@ def main_worker(gpu, ngpus_per_node, args):
 
         student.eval()
         eval_results = evaluator(student, device=args.gpu)
-        (acc1, acc5), val_loss = eval_results['Acc'], eval_results['Loss']
-        args.logger.info('[Eval] Epoch={current_epoch} Acc@1={acc1:.4f} Acc@5={acc5:.4f} Loss={loss:.4f} Lr={lr:.4f}'
-                .format(current_epoch=args.current_epoch, acc1=acc1, acc5=acc5, loss=val_loss, lr=optimizer.param_groups[0]['lr']))
+        # (acc1, acc5), val_loss = eval_results['Acc'], eval_results['Loss']
+        acc = eval_results['Acc']
+        args.logger.info('[Eval] Epoch={current_epoch} Acc={acc1:.4f} Loss={loss:.4f} Lr={lr:.4f}'
+                .format(current_epoch=args.current_epoch, acc=acc, loss=val_loss, lr=optimizer.param_groups[0]['lr']))
+        # args.logger.info('[Eval] Epoch={current_epoch} Acc@1={acc1:.4f} Acc@5={acc5:.4f} Loss={loss:.4f} Lr={lr:.4f}'
+        #         .format(current_epoch=args.current_epoch, acc1=acc1, acc5=acc5, loss=val_loss, lr=optimizer.param_groups[0]['lr']))
 
-        is_best = acc1 > best_acc1
-        best_acc1 = max(acc1, best_acc1)
+        is_best = acc > best_acc1
+        best_acc1 = max(acc, best_acc1)
         _best_ckpt = 'checkpoints/datafree-%s/%s-%s-%s.pth'%(args.method, args.dataset, args.teacher, args.student)
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                 and args.rank % ngpus_per_node == 0):
