@@ -385,6 +385,7 @@ def main_worker(gpu, ngpus_per_node, args):
         eval_results = evaluator(student, device=args.gpu)
         # (acc1, acc5), val_loss = eval_results['Acc'], eval_results['Loss']
         acc = eval_results['Acc']
+        val_loss = eval_results['Loss']
         args.logger.info('[Eval] Epoch={current_epoch} Acc={acc1:.4f} Loss={loss:.4f} Lr={lr:.4f}'
                 .format(current_epoch=args.current_epoch, acc=acc, loss=val_loss, lr=optimizer.param_groups[0]['lr']))
         # args.logger.info('[Eval] Epoch={current_epoch} Acc@1={acc1:.4f} Acc@5={acc5:.4f} Loss={loss:.4f} Lr={lr:.4f}'
