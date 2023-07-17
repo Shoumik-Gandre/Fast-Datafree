@@ -62,3 +62,11 @@ def segmentation_evaluator(dataloader, num_classes, ignore_idx=255):
         'Loss': metrics.RunningLoss(torch.nn.CrossEntropyLoss(reduction='sum'))
     })
     return Evaluator( metric, dataloader=dataloader)
+
+
+def classification_evaluator2(dataloader):
+    metric = metrics.MetricCompose({
+        'Acc': metrics.Accuracy(),
+        'Loss': metrics.RunningLoss(torch.nn.CrossEntropyLoss(reduction='sum'))
+    })
+    return Evaluator( metric, dataloader=dataloader)
